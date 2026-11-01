@@ -35,11 +35,10 @@ thiserror = "2"
 trash = "5"
 base64 = "0.22"
 tauri-plugin-store = "2.4.2"
-tauri-plugin-updater = "2"
 tauri-plugin-single-instance = "2"
 tauri-plugin-webdriver = { version = "0.2", optional = true }
-# Telemetry transport. Feature set mirrors tauri-plugin-updater's so the
-# dependency graph does not grow — both are already resolved in Cargo.lock.
+# Telemetry transport. reqwest's rustls feature installs no default crypto
+# provider, so rustls with the ring backend is pulled in alongside it.
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls-no-provider"] }
 rustls = { version = "0.23", default-features = false, features = ["ring"] }
 

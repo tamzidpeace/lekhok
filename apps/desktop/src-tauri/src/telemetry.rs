@@ -456,11 +456,8 @@ fn retain_sendable(queued: &mut Vec<QueuedEvent>, enabled: bool) {
 async fn run_dispatcher(mut receiver: UnboundedReceiver<QueuedEvent>) {
     let Some(api_key) = POSTHOG_KEY else { return };
 
-    // reqwest is built with `rustls-no-provider` (matching tauri-plugin-updater,
-    // which is why this adds no crates to the tree), so the process needs a
-    // crypto provider installed before the first TLS handshake. The updater
-    // installs the same one lazily; whichever runs first wins and the other
-    // call is a no-op.
+    // reqwest is built with `rustls-no-provider`, so the process needs a
+    // crypto provider installed before the first TLS handshake.
     let _ = rustls::crypto::ring::default_provider().install_default();
 
     let client = match reqwest::Client::builder()

@@ -9,8 +9,6 @@ mod macos;
 pub mod open_target;
 mod state;
 mod telemetry;
-#[cfg(desktop)]
-mod updater;
 mod watcher;
 pub mod writer_cli;
 
@@ -272,16 +270,10 @@ fn position_new_window(app: &tauri::AppHandle, window: &WebviewWindow) {
     let _ = window.set_position(PhysicalPosition::new(x, y));
 }
 
-/// Build the native menu bar and wire updater menu events. macOS only needs a
-/// menu at all because of the auto-updater; the rest of the items are standard
-/// predefined actions so nothing has to be rewired on the frontend.
+/// Build the native menu bar. macOS needs a menu for the standard predefined
+/// actions (About, Hide, Quit) so nothing has to be rewired on the frontend.
 #[cfg(desktop)]
-fn install_app_menu(
-    app: &tauri::AppHandle,
-    app_data_dir: PathBuf,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let check_item = MenuItemBuilder::with_id("updater.check", "Check for Updates…").build(app)?;
-
+fn install_app_menu(app: &tauri::AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let preferences_item = MenuItemBuilder::with_id("preferences.open", "Preferences…")
         .accelerator("CmdOrCtrl+,")
         .build(app)?;
@@ -292,8 +284,6 @@ fn install_app_menu(
     let app_submenu = {
         let b = SubmenuBuilder::new(app, "Lekhok")
             .item(&PredefinedMenuItem::about(app, Some("About Lekhok"), None)?)
-            .separator()
-            .item(&check_item)
             .separator()
             .item(&preferences_item);
         #[cfg(target_os = "macos")]
@@ -333,9 +323,6 @@ fn install_app_menu(
 
     app.set_menu(menu)?;
 
-    let menu_items = updater::UpdaterMenuItems { check: check_item };
-    app.manage(updater::UpdaterManager::new(menu_items, app_data_dir));
-
     #[cfg(target_os = "macos")]
     {
         app.manage(CliMenuItem(cli_item));
@@ -343,7 +330,6 @@ fn install_app_menu(
     }
 
     app.on_menu_event(|app, event| match event.id().0.as_str() {
-        "updater.check" => updater::start_check(app.clone(), true),
         "preferences.open" => emit_to_focused_window(app, "menu:open-preferences"),
         #[cfg(target_os = "macos")]
         "cli.toggle" => run_cli_toggle(app.clone()),
@@ -545,24 +531,9 @@ pub fn run() {
 
             #[cfg(desktop)]
             {
-                let config_dir = app
-                    .path()
-                    .app_data_dir()
-                    .expect("failed to get app data dir");
-                app.handle()
-                    .plugin(tauri_plugin_updater::Builder::new().build())?;
-                install_app_menu(app.handle(), config_dir)?;
+                install_app_menu(app.handle())?;
                 #[cfg(target_os = "macos")]
                 dock_menu::install(app.handle());
-
-                // Kick off the launch check once the window is ready to show
-                // any follow-up dialogs on top of a visible app.
-                let handle = app.handle().clone();
-                tauri::async_runtime::spawn(async move {
-                    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
-                    updater::start_check(handle.clone(), false);
-                    updater::spawn_daily_check(handle);
-                });
             }
 
             // Attach drag-drop + close handlers on the main window.
