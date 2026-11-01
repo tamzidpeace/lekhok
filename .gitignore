@@ -38,3 +38,4 @@ SPECs/Agent/qa-typing-pass-2026-10-04/videos/
 
 # agent scratch
 .superpowers/
+.vitest/

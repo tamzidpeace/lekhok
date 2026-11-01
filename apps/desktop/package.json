@@ -1,6 +1,6 @@
 {
   "name": "desktop",
-  "version": "0.8.0",
+  "version": "0.8.0-l2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -52,6 +52,6 @@
     "@welldone-software/why-did-you-render": "catalog:",
     "jsdom": "catalog:",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "vite": "catalog:"
   }
 }

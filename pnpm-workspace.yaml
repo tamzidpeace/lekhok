@@ -30,41 +30,63 @@ catalog:
   "@types/node": ^24
   "@welldone-software/why-did-you-render": ^10.0.1
   cmdk: ^1.1.1
-  dompurify: ^3.4.7
+  dompurify: ^3.4.17
   jsdom: ^30.1.2
-  katex: ^0.16.25
+  katex: ^0.18.2
   motion: ^12.39.0
   node-emoji: ^2.2.0
   pele: ^1.6.0
-  posthog-js: ^1.429.2
+  posthog-js: ^1.444.0
   react-resizable-panels: ^4.7.4
   tailwindcss: ^4.2.2
   typescript: ^5
-  vite: npm:@voidzero-dev/vite-plus-core@latest
-  vite-plus: ^0.1.22
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
+  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vite-plus: 1.4.0
   yaml: ^2.8.3
   zustand: ^5.0.12
 
 catalogMode: prefer
 overrides:
-  "@voidzero-dev/vite-plus-test>vite": 8.0.14
-  basic-ftp: 5.3.1
+  # Security floors for transitive deps (Dependabot 2026-11). Update these
+  # when advisories land; several were left pinned to vulnerable versions
+  # by upstream.
+  "@babel/core": 7.29.6
+  # Dedupe peer hashes so vite-plus-core resolves as one copy (mixed
+  # typescript/@types/node peers split it in two and break tsc).
+  "@types/node": 25.5.0
+  typescript: "~5.8.3"
+  baseline-browser-mapping: 2.11.0
+  basic-ftp: 6.2.1
+  brace-expansion@1: 1.1.21
+  brace-expansion@2: 2.1.7
+  browserslist: 4.28.7
+  deepmerge-ts: 8.0.0
+  dompurify: 3.4.17
+  esbuild: 0.28.2
   fast-xml-builder: 1.1.7
   fast-xml-parser: 5.7.0
-  ip-address: 10.1.1
+  glob: 14.0.3
+  ip-address: 10.7.4
+  js-yaml: 4.3.2
+  launch-editor: 2.14.2
   lodash: 4.18.1
+  minimatch: 11.0.3
   picomatch: 4.0.4
-  postcss: 8.5.15
-  serialize-javascript: 7.0.5
-  vite: "catalog:"
-  vitest: "catalog:"
-  "website>vite": "npm:vite@^8.0.16"
-  ws: 8.20.1
+  postcss: 8.5.23
+  serialize-javascript: 7.1.3
+  seroval: 1.6.8
+  shell-quote: 1.11.0
+  source-map-js: 1.2.2
+  tinypool: 2.1.2
+  undici: 6.29.1
+  ws: 8.21.0
+  zod: 4.6.6
+  vite@*: "catalog:"
 peerDependencyRules:
   allowAny:
     - vite
-    - vitest
   allowedVersions:
     vite: "*"
-    vitest: "*"
+allowBuilds:
+  edgedriver: true
+  geckodriver: true

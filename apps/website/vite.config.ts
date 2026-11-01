@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig } from "vite-plus";
 import { devtools } from "@tanstack/devtools-vite";
 
 const tauriConfPath = fileURLToPath(
@@ -19,6 +19,13 @@ const RELEASES_URL = `https://github.com/${RELEASE_REPO}/releases/tag/v${VERSION
 const REPO_URL = "https://github.com/joelbqz/writer-computer";
 
 export default defineConfig({
+  test: {
+    // Vitest v4 compatibility: preserve mock call history.
+    // Remove after tests no longer rely on calls from setup or earlier tests.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
+    clearMocks: false,
+  },
   plugins: [
     devtools(),
     tanstackStart({
