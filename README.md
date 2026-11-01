@@ -1,53 +1,79 @@
-# Writer
+# Lekhok
 
-Fast and lightweight app for your workspace's markdown files
+Lekhok is a free and open-source markdown editor for **Intel (x86_64) Macs**.
+It is a fork of [Writer Computer](https://github.com/joelbqz/writer-computer)
+by joelbqz — a ~6 MB download, starts faster than Apple Notes and Obsidian,
+and opens very large workspaces instantly. Upstream ships Apple Silicon
+builds only; Lekhok exists so Intel Macs get the same editor. The app keeps
+documents on disk, respects workspace `.gitignore` rules, supports multiple
+windows, and renders extended markdown such as tables and Mermaid diagrams.
 
-![Writer](./assets/screenshot.png)
+## Install (macOS 10.15+, Intel)
 
-It is built with Tauri v2, React, Zustand, CodeMirror, and Rust. The app keeps documents on disk, respects workspace `.gitignore` rules, supports multiple windows, renders extended markdown such as tables and Mermaid diagrams, and ships with a signed macOS release flow.
+1. Grab `Lekhok_<version>_x64.dmg` from
+   [Releases](../../releases).
+2. Open the DMG and drag **Lekhok** into **Applications**.
+3. The build is ad-hoc signed (no Apple Developer account). On first launch
+   macOS may warn it cannot verify the developer — **right-click Lekhok.app →
+   Open → Open** once, and it launches normally afterwards. If the warning
+   says the app is blocked outright, run:
+   ```bash
+   xattr -cr /Applications/Lekhok.app
+   ```
 
-## Repository
+Releases include the sha256 of the DMG.
 
-- `apps/desktop/` — Tauri desktop app.
-- `apps/desktop/src/` — React frontend.
-- `apps/desktop/src-tauri/src/` — Rust commands, workspace state, watcher, updater, and CLI integration.
-- `apps/website/` — landing page.
-- `docs/` — project and agent workflow docs.
-- `SPECs/` — feature specs and design notes.
+## Why a fork
 
-## Development
+Upstream [writer-computer](https://github.com/joelbqz/writer-computer) is an
+excellent, actively developed editor — but it is released for Apple Silicon
+(`aarch64`) only, with no CI and no x86_64 pipeline. Lekhok starts from the
+`v0.8.0` tag and adds what upstream is missing for Intel:
 
-This repo uses Vite+ through the `vp` CLI. Use `vp` instead of calling the package manager or Vite tooling directly.
+- x86_64 release builds (`scripts/release-intel.sh`, guard-checked)
+- Deletions move to Trash via `NSFileManager` instead of a Finder
+  AppleEvent, which stalls on some Intel Macs and would prompt for
+  automation permissions on unsigned builds (cost: no Finder "Put Back")
+- The auto-updater is removed: upstream's update feed serves arm64
+  artifacts and would brick an Intel install. A per-platform updater may
+  return in a later release.
+
+Everything else is upstream v0.8.0: same Tauri v2 + Rust + React +
+CodeMirror stack, same features, same local-first behavior. Telemetry is
+not compiled into these builds at all.
+
+## Build from source
+
+Prerequisites: an Intel Mac, Node.js ≥ 22.12 (nvm works), pnpm 10.32.1
+(`corepack enable && corepack prepare pnpm@10.32.1 --activate`), and Rust
+stable (`rustup`). The release script refuses to run on non-Intel hosts.
 
 ```bash
-vp install
-vp dev
+pnpm install
+pnpm run dev                    # develop
+./scripts/release-intel.sh      # build Lekhok_<version>_x64.dmg
 ```
 
-## Validation
+Validation:
 
 ```bash
-vp check
-vp test
+cd apps/desktop/src-tauri && cargo test && cargo clippy
+cd apps/desktop && pnpm exec tsc
 ```
 
-Rust validation runs from the Tauri crate:
+Note: keep the `@tauri-apps/api` and `@tauri-apps/plugin-dialog` npm
+versions on the **same minor** as their Rust crates (`tauri`,
+`tauri-plugin-dialog` in `Cargo.lock`) — `tauri build` enforces the match.
 
-```bash
-cd apps/desktop/src-tauri
-cargo test
-cargo clippy
-cargo fmt --check
-```
+## Roadmap
 
-## Privacy
+- [x] v0.8.0-l1 — Intel (x86_64) Mac release
+- [ ] Windows build (NSIS installer) — the codebase already carries
+      Windows branches for most platform code
+- [ ] Linux build (AppImage / .deb) — ditto
+- [ ] Per-platform auto-updater pointed at this repo's releases
+- [ ] Periodic merges from upstream
 
-Writer is local-first and stays that way. It ships opt-in usage telemetry that
-is **off until you turn it on**, never sees your documents, file names, or
-paths, and is not even compiled into builds made from a clone of this repo.
-[`docs/telemetry.md`](./docs/telemetry.md) lists every event and property, and
-the three independent ways to keep it off.
+## License
 
-## Releases
-
-macOS releases are cut locally with `scripts/distribute.sh`. See `docs/releasing.md` for the signed, notarized release workflow and updater publishing details.
+GPL-3.0, same as upstream. See [LICENSE](./LICENSE).
