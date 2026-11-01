@@ -687,7 +687,22 @@ pub fn delete_entry_impl(path: &str) -> Result<(), AppError> {
     if !entry_path.exists() {
         return Err(AppError::NotFound(path.to_string()));
     }
-    trash::delete(&entry_path).map_err(|e| AppError::Io(e.to_string()))?;
+    // Upstream keeps the trash crate's default, which asks Finder over an
+    // AppleEvent. That event stalls on some Intel Macs (the delete times out
+    // after 120s) and would raise a TCC automation prompt on every machine
+    // running these unsigned builds. NSFileManager's trashItemAtURL needs no
+    // permission; the cost is losing Finder's "Put Back" on trashed files.
+    #[cfg(target_os = "macos")]
+    {
+        use trash::macos::{DeleteMethod, TrashContextExtMacos};
+        let mut ctx = trash::TrashContext::new();
+        ctx.set_delete_method(DeleteMethod::NsFileManager);
+        ctx.delete(&entry_path).map_err(|e| AppError::Io(e.to_string()))?;
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        trash::delete(&entry_path).map_err(|e| AppError::Io(e.to_string()))?;
+    }
     Ok(())
 }
 
