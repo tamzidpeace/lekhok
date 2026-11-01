@@ -37,7 +37,7 @@ Telemetry is not compiled in. No PostHog key ships.
 
 ## sha256
 
-    f3632de40b875bc2e14516b4ef406370795813b238fbcfa4554ca969c2291d0b  Lekhok_0.8.0-l1_x64.dmg
+    2bab2a4d211eb9485366faba627d0fc6287ce2e3775343a83f7ebf1372a0aeef  Lekhok_0.8.0-l1_x64.dmg
 
 ## Roadmap
 

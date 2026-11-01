@@ -1125,12 +1125,34 @@ mod tests {
     #[test]
     fn test_delete_entry_moves_to_trash() {
         let dir = TempDir::new().unwrap();
-        let path = dir.path().join("to_delete.md");
+        // Unique per run so a stale entry from an earlier run can't satisfy
+        // the Trash assertion below.
+        let name = format!("to_delete_{}.md", std::process::id());
+        let path = dir.path().join(&name);
         fs::write(&path, "delete me").unwrap();
         assert!(path.exists());
 
         delete_entry_impl(&path.to_string_lossy()).unwrap();
         assert!(!path.exists());
+        // The promise is recoverability: the entry must land in the user's
+        // Trash, not vanish. Tempdirs share the boot volume with ~/.Trash,
+        // so NSFileManager moves them there rather than unlinking. macOS
+        // TCC denies most processes the right to LIST ~/.Trash, so the
+        // destination check runs only where the host allows it.
+        let trash = PathBuf::from(std::env::var("HOME").unwrap()).join(".Trash");
+        match fs::read_dir(&trash) {
+            Ok(entries) => {
+                let trashed = entries
+                    .filter_map(|e| e.ok())
+                    .any(|e| e.file_name() == name.as_str());
+                assert!(trashed, "expected {name} in {}", trash.display());
+                fs::remove_file(trash.join(&name)).ok(); // leave ~/.Trash as found
+            }
+            Err(err) if err.kind() == std::io::ErrorKind::PermissionDenied => {
+                eprintln!("~/.Trash not listable here (TCC); skipping destination check");
+            }
+            Err(err) => panic!("could not read {}: {err}", trash.display()),
+        }
     }
 
     #[test]
