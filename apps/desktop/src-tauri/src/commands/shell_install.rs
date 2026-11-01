@@ -2,7 +2,8 @@
 //!
 //! The running Lekhok binary is itself the CLI: `main.rs` dispatches to CLI
 //! mode when argv[0]'s basename is `lekhok`, so "install" is just a symlink
-//! from `/usr/local/bin/lekhok` to `Lekhok.app/Contents/MacOS/Lekhok`.
+//! from `/usr/local/bin/lekhok` to `Lekhok.app/Contents/MacOS/<binary>`
+//! (the Cargo package name — it must not be named `Lekhok`, see `main.rs`).
 //! When `Lekhok.app` is replaced in place by a future updater, the symlink
 //! still points at the new binary because we link through the bundle path.
 //!

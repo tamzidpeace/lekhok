@@ -21,8 +21,10 @@ upstream does not ship for.
 4. **Release pipeline** — `scripts/release-intel.sh` builds on an Intel
    Mac and hard-fails unless the host is `x86_64-apple-darwin`, the binary
    verifies as x86_64, the DMG is under 10 MB, and no telemetry key is set.
-   The app is ad-hoc signed so quarantined downloads stay openable via
-   right-click → Open.
+   The app is ad-hoc signed. On macOS 15+ clear the first-launch block with
+   `xattr -dr com.apple.quarantine /Applications/Lekhok.app` or
+   System Settings → Privacy & Security → Open Anyway (the right-click →
+   Open bypass was removed in macOS 15).
 5. **Version alignment** — `@tauri-apps/api` ~2.11 and
    `@tauri-apps/plugin-dialog` ~2.7 pinned to the Rust crates' minors
    (tauri build enforces this).
@@ -37,7 +39,7 @@ Telemetry is not compiled in. No PostHog key ships.
 
 ## sha256
 
-    2bab2a4d211eb9485366faba627d0fc6287ce2e3775343a83f7ebf1372a0aeef  Lekhok_0.8.0-l1_x64.dmg
+    20d6c00c24b35cabeea20c7c6e739d7c643cb6b6be10d753f4bb5e899a094f5b  Lekhok_0.8.0-l1_x64.dmg
 
 ## Roadmap
 

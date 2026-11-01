@@ -13,13 +13,16 @@ windows, and renders extended markdown such as tables and Mermaid diagrams.
 1. Grab `Lekhok_<version>_x64.dmg` from
    [Releases](../../releases).
 2. Open the DMG and drag **Lekhok** into **Applications**.
-3. The build is ad-hoc signed (no Apple Developer account). On first launch
-   macOS may warn it cannot verify the developer — **right-click Lekhok.app →
-   Open → Open** once, and it launches normally afterwards. If the warning
-   says the app is blocked outright, run:
+3. The build is ad-hoc signed (no Apple Developer account), so macOS will
+   block the first launch with an "unidentified developer" warning. On
+   **macOS 15 and later the right-click → Open bypass no longer works**.
+   Either run this in Terminal after dragging the app over:
    ```bash
-   xattr -cr /Applications/Lekhok.app
+   xattr -dr com.apple.quarantine /Applications/Lekhok.app
    ```
+   …or open **System Settings → Privacy & Security**, scroll down, and click
+   **Open Anyway** next to the "Lekhok.app was blocked" notice. After the
+   first successful launch it opens normally.
 
 Releases include the sha256 of the DMG.
 
