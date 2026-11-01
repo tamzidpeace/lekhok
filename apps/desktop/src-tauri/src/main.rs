@@ -4,9 +4,9 @@
 use std::path::Path;
 use std::process::ExitCode;
 
-/// Multi-call dispatch: a symlink named `writer` in the user's PATH points
-/// at the Writer app binary. When invoked through that symlink, argv[0]'s
-/// basename is `writer` and we run the CLI. Invoked as `Writer` (the usual
+/// Multi-call dispatch: a symlink named `lekhok` in the user's PATH points
+/// at the Lekhok app binary. When invoked through that symlink, argv[0]'s
+/// basename is `lekhok` and we run the CLI. Invoked as `Lekhok` (the usual
 /// case, direct from the bundle), we run the Tauri app.
 fn main() -> ExitCode {
     if is_cli_invocation() {
@@ -25,6 +25,6 @@ fn is_cli_invocation() -> bool {
     Path::new(&arg0)
         .file_stem()
         .and_then(|s| s.to_str())
-        .map(|name| name.eq_ignore_ascii_case("writer"))
+        .map(|name| name.eq_ignore_ascii_case("lekhok"))
         .unwrap_or(false)
 }

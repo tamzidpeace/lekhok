@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Writer",
-  "version": "0.8.0",
-  "identifier": "com.writer-computer",
+  "productName": "Lekhok",
+  "version": "0.8.0-l1",
+  "identifier": "com.lekhok.desktop",
   "build": {
     "beforeDevCommand": "vp dev",
     "devUrl": "http://localhost:1420",
